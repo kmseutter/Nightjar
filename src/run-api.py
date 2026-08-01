@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 import uvicorn
 
 app = FastAPI(title="User Auth API")
@@ -28,11 +28,14 @@ async def logout():
 
 @app.get("/user")
 async def user_get():
-    userTest = Users(id=1)
-    print(userTest)
+    with Session(engine) as session:
+        statement = select(Users).where(Users.id == 1)
+        results = session.exec(statement)
+        user = results.first()
+
     return {
-        userTest.id,
-        userTest.name
+        user.id,
+        user.name
     }
 
 class Settings(BaseSettings):

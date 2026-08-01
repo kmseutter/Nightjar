@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/user/login
+  url: {{baseUrl}}/user/login?foo=bar
   body: none
-  auth: none
+  auth: inherit
+}
+
+params:query {
+  foo: bar
 }
