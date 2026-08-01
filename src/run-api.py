@@ -28,10 +28,9 @@ async def logout():
 
 class Settings(BaseSettings):
     database_url: str
-    jwt_secret_key: str
     debug_mode: bool = False
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file="../.env")
 
 settings = Settings()
 
