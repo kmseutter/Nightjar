@@ -26,9 +26,17 @@ async def logout():
         "message": "Successfully logged out"
     }
 
+@app.get("/user")
+async def user_get():
+    userTest = Users(id=1)
+    print(userTest)
+    return {
+        userTest.id,
+        userTest.name
+    }
 
 class Settings(BaseSettings):
-    # Example for .env file: database_url=postgresql://user:password@10.0.0.66:5432/my_rbac_db
+    # Example for .env file: database_url=postgresql://user:password@10.0.0.66:5432/nightjardev
     database_url: str
     debug_mode: bool = False
 
