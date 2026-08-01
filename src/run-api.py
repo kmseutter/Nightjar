@@ -32,11 +32,25 @@ class Settings(BaseSettings):
     database_url: str
     debug_mode: bool = False
 
-    model_config = SettingsConfigDict(env_file="../.env")
+    model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()
+
+class Users(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    password: str | None = None
+    email: str | None = None
+    address: str | None = None
+    phone: str | None = None
+
+userTest = Users(name="Can Write to DB!")
+
 engine = create_engine(settings.database_url)
 SQLModel.metadata.create_all(engine)
+with Session(engine) as session:
+    session.add(userTest)
+    session.commit()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
