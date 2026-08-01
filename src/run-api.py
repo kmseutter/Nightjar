@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 import uvicorn
 
 app = FastAPI(title="User Auth API")
@@ -23,6 +24,17 @@ async def logout():
     return {
         "message": "Successfully logged out"
     }
+
+
+class Settings(BaseSettings):
+    database_url: str
+    jwt_secret_key: str
+    debug_mode: bool = False
+
+    model_config = SettingsConfigDict(env_file=".env")
+
+settings = Settings()
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
