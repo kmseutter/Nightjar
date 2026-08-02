@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 import uvicorn
 #bad practice to use *, info may be shared when not meant to#
-from models import *
+from src.models import *
 
 app = FastAPI(title="User Auth API")
 
