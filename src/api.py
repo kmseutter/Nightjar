@@ -18,7 +18,7 @@ async def login(credentials: LoginRequest):
     # In a real app, you would hash the password and check it against a database here.
     return {
         "message": f"Welcome, {credentials.username}",
-        "token": "example-jwt-token-12345"
+        "token": "example-jwt-token-123456"
     }
 
 @app.post("/user/logout")
@@ -41,6 +41,7 @@ async def user_get(user_id: int):
         statement = select(Users).where(Users.id == user_id)
         results = session.exec(statement)
         user = results.first()
+    return user.model_dump()
     return {
         user.id,
         user.name
