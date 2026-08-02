@@ -34,7 +34,7 @@ async def user_get():
         user = results.first()
 
 @app.get("/user/{user_id}")
-async def user_get(user_id):
+async def user_get(user_id: int):
     with Session(engine) as session:
         statement = select(Users).where(Users.id == user_id)
         results = session.exec(statement)
