@@ -33,6 +33,12 @@ async def user_get():
         results = session.exec(statement)
         user = results.first()
 
+@app.get("/user/{user_id}")
+async def user_get(user_id):
+    with Session(engine) as session:
+        statement = select(Users).where(Users.id == user_id)
+        results = session.exec(statement)
+        user = results.first()
     return {
         user.id,
         user.name
