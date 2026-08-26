@@ -6,10 +6,17 @@ meta {
 
 post {
   url: {{baseUrl}}/user/login
-  body: none
+  body: json
   auth: inherit
 }
 
 params:query {
   foo: bar
+}
+
+body:json {
+  {
+    "username": "your_test_user",
+    "password": "your_test_password"
+  }
 }

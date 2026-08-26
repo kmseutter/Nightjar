@@ -15,11 +15,17 @@ class LoginRequest(BaseModel):
 
 @app.post("/user/login")
 async def login(credentials: LoginRequest):
-    # In a real app, you would hash the password and check it against a database here.
-    return {
-        "message": f"Welcome, {credentials.username}",
-        "token": "example-jwt-token-123456"
-    }
+
+    with Session(engine) as session:
+        statement = select(Users).where(Users.username == credentials.username)
+        results = session.exec(statement)
+        user = results.first()
+        if user and user.password == credentials.password:
+            return {
+                "message": f"Welcome, {credentials.username}",
+                "token": "example-jwt-token-123456"
+            }
+    return {"message": "Access denied"}
 
 @app.post("/user/logout")
 async def logout():
