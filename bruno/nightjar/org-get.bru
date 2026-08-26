@@ -1,0 +1,16 @@
+meta {
+  name: org-get
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/organization/0
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

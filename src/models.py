@@ -19,3 +19,6 @@ class Roles(SQLModel, table=True):
 class Permissions(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     permission: str
+
+########class Users_to_Orgs(SQLModel, table=True):
+    

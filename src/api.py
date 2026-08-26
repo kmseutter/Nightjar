@@ -47,6 +47,18 @@ async def user_get(user_id: int):
         user.name
     }
 
+@app.get("/organization/{org_id}")
+async def org_get(org_id: int):
+    with Session(engine) as session:
+        statement = select(Organizations).where(Organizations.id == org_id)
+        results = session.exec(statement)
+        org = results.first()
+    return org.model_dump()
+    return {
+        org.id,
+        org.name
+    }
+
 class Settings(BaseSettings):
     # Example for .env file: database_url=postgresql://user:password@10.0.0.66:5432/nightjardev
     database_url: str
