@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 import uvicorn
 #bad practice to use *, info may be shared when not meant to#
 from src.models import *
+from src.secure import *
 
 app = FastAPI(title="User Auth API")
 
@@ -13,19 +14,47 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+# Register payload
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+
+@app.post("/user/register", response_model = UserResponse, status_code= status.HTTP_201_CREATED)
+def register(payload: RegisterRequest):
+    with Session(engine) as session:
+        existing_user = session.exec(select(Users).where(Users.username == payload.username)).first()
+        if existing_user:
+            raise HTTPException(
+                status_code= status.HTTP_400_BAD_REQUEST,
+                detail = "Username already registered"
+            )
+        
+        user = Users(
+            username = payload.username,
+            password = hash_password(payload.password)
+        )
+
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
+
 @app.post("/user/login")
 async def login(credentials: LoginRequest):
 
     with Session(engine) as session:
         statement = select(Users).where(Users.username == credentials.username)
-        results = session.exec(statement)
-        user = results.first()
-        if user and user.password == credentials.password:
-            return {
-                "message": f"Welcome, {credentials.username}",
-                "token": "example-jwt-token-123456"
-            }
-    return {"message": "Access denied"}
+        user = session.exec(statement).first()
+        if not user or not verify_password(credentials.password, user.password):
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "Invalid username or password"
+            )
+        return {"message": f"Successfully authenticated as user {user.username}"}
 
 @app.post("/user/logout")
 async def logout():
