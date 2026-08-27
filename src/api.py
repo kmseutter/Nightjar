@@ -1,13 +1,23 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 import uvicorn
 #bad practice to use *, info may be shared when not meant to#
+from src.database import engine, SessionDep
 from src.models import *
-from src.secure import *
+from src.secure import router as secure_router
 
-app = FastAPI(title="User Auth API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Anything to run during startup
+    SQLModel.metadata.create_all(engine)
+    yield
+    # Anything to run during shutdown
+
+app = FastAPI(title="User Auth API", lifespan=lifespan)
+app.include_router(secure_router)
 
 # The login payload
 class LoginRequest(BaseModel):
@@ -94,17 +104,6 @@ async def org_get(org_id: int):
         org.name
     }
 
-class Settings(BaseSettings):
-    # Example for .env file: database_url=postgresql://user:password@10.0.0.66:5432/nightjardev
-    database_url: str
-    debug_mode: bool = False
-
-    model_config = SettingsConfigDict(env_file=".env")
-
-settings = Settings()
-
-engine = create_engine(settings.database_url)
-SQLModel.metadata.create_all(engine)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
